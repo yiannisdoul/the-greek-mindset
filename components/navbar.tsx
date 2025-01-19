@@ -42,20 +42,20 @@ export default function Navbar() {
               Workout Plan
             </Link>
             <Link 
-              href="/about" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/about' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              About
-            </Link>
-            <Link 
               href="/shop" 
               className={`text-gray-300 hover:text-white px-3 py-2 ${
                 pathname === '/shop' ? 'text-white font-semibold' : ''
               }`}
             >
               Shop
+            </Link>
+            <Link 
+              href="/about" 
+              className={`text-gray-300 hover:text-white px-3 py-2 ${
+                pathname === '/about' ? 'text-white font-semibold' : ''
+              }`}
+            >
+              About
             </Link>
             <Link 
               href="/contact" 
