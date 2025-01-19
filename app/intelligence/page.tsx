@@ -13,29 +13,29 @@ const articles = [
   },
   {
     id: '2',
-    title: 'Plato\'s Theory of Forms',
-    excerpt: 'Understand the fundamental concepts of Plato\'s metaphysical theory.',
-    category: 'Philosophy',
+    title: 'Spartan Training Techniques for Mental Toughness',
+    excerpt: 'Learn how to build resilience and mental strength using ancient Spartan methods.',
+    category: 'Fitness',
     imageUrl: '/placeholder.svg?height=300&width=400',
-    author: 'Aristotle Scholar',
+    author: 'Leonidas Trainer',
     date: 'June 1, 2025'
   },
   {
     id: '3',
-    title: 'The Socratic Method in Modern Discourse',
-    excerpt: 'Learn how to apply Socratic questioning in contemporary debates and discussions.',
-    category: 'Critical Thinking',
+    title: 'The Mediterranean Diet: Eating Like the Ancients',
+    excerpt: 'Discover the health benefits of traditional Greek cuisine and how to incorporate it into your diet.',
+    category: 'Diet',
     imageUrl: '/placeholder.svg?height=300&width=400',
-    author: 'Logical Thinker',
+    author: 'Hippocrates Health',
     date: 'June 10, 2025'
   },
   // Add more articles as needed
 ]
 
-export default function IntelligencePage() {
+export default function ArticlesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Intelligence: Cultivate Your Mind</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Articles</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {articles.map((article) => (
           <ArticleCard key={article.id} {...article} />
