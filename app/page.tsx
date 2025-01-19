@@ -11,13 +11,15 @@ export default function Home() {
   const [hoveredSection, setHoveredSection] = useState<'warrior' | 'philosopher' | null>(null)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex flex-col">
       <Navbar />
+
       <main className="container mx-auto px-4 py-8">
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
           {/* Warrior Section */}
           <motion.div
-            className="relative h-[600px] bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer"
+            className="relative bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer"
             whileHover={{ scale: 1.02 }}
             onHoverStart={() => setHoveredSection('warrior')}
             onHoverEnd={() => setHoveredSection(null)}
@@ -25,12 +27,12 @@ export default function Home() {
             <Image
               src="/images/light-logo.jpeg"
               alt="Warrior Spirit"
-              width={300}
-              height={300}
-              className="mb-8"
+              width={250}
+              height={250}
+              className="mb-4"
             />
-            <h2 className="text-4xl font-bold text-white mb-4">Build Strength and Resilience</h2>
-            <p className="text-gray-300 text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Build Strength and Resilience</h2>
+            <p className="text-sm md:text-base text-gray-300 text-center mb-4">
               Embrace the Spartan way of life through disciplined training and warrior mindset
             </p>
             <Button 
@@ -43,7 +45,7 @@ export default function Home() {
 
           {/* Philosopher Section */}
           <motion.div
-            className="relative h-[600px] bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer"
+            className="relative bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer"
             whileHover={{ scale: 1.02 }}
             onHoverStart={() => setHoveredSection('philosopher')}
             onHoverEnd={() => setHoveredSection(null)}
@@ -51,12 +53,12 @@ export default function Home() {
             <Image
               src="/images/dark-logo.jpeg"
               alt="Philosophy and Wisdom"
-              width={300}
-              height={300}
-              className="mb-8"
+              width={150}
+              height={150}
+              className="mb-4"
             />
-            <h2 className="text-4xl font-bold text-white mb-4">Build Wisdom and Knowledge</h2>
-            <p className="text-gray-300 text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Build Wisdom and Knowledge</h2>
+            <p className="text-sm md:text-base text-gray-300 text-center mb-4">
               Discover the timeless wisdom of Greek philosophy and ancient knowledge
             </p>
             <Button 

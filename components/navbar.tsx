@@ -48,7 +48,7 @@ export default function Navbar() {
   )
 
   return (
-    <nav className="bg-gray-900/50 backdrop-blur-sm fixed w-full z-50 top-0 left-0 border-b border-gray-700">
+    <nav className="bg-gradient-to-b from-gray-900 to-gray-800 fixed w-full z-50 top-0 left-0 border-b border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center">
