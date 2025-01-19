@@ -34,6 +34,14 @@ export default function Navbar() {
               Articles
             </Link>
             <Link 
+              href="/workout-plan" 
+              className={`text-gray-300 hover:text-white px-3 py-2 ${
+                pathname === '/workout-plan' ? 'text-white font-semibold' : ''
+              }`}
+            >
+              Workout Plan
+            </Link>
+            <Link 
               href="/about" 
               className={`text-gray-300 hover:text-white px-3 py-2 ${
                 pathname === '/about' ? 'text-white font-semibold' : ''
