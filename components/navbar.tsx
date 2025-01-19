@@ -20,8 +20,9 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   const navItems = [
-    { href: '/articles', label: 'Articles' },
-    { href: '/workout-plan', label: 'Workout Plan' },
+    { href: '/', label: 'Home' },
+    { href: '/fortitude', label: 'Fortitude' },
+    { href: '/intelligence', label: 'Intelligence' },
     { href: '/shop', label: 'Shop' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },

@@ -24,10 +24,10 @@ const workouts = [
   },
 ] as const;
 
-export default function WorkoutPlanPage() {
+export default function FortitudePage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Workout Plan</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Fortitude: Build Your Strength</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {workouts.map((workout, index) => (
           <WorkoutCard key={index} {...workout} />

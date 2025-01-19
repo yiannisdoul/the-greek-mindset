@@ -38,8 +38,9 @@ export default function Home() {
             <Button 
               variant="outline" 
               className="bg-red-600 text-white border-red-500 hover:bg-red-700"
+              asChild
             >
-              Begin Training
+              <Link href="/fortitude">Begin Training</Link>
             </Button>
           </motion.div>
 
@@ -53,8 +54,8 @@ export default function Home() {
             <Image
               src="/images/dark-logo.jpeg"
               alt="Philosophy and Wisdom"
-              width={150}
-              height={150}
+              width={250}
+              height={250}
               className="mb-4"
             />
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Build Wisdom and Knowledge</h2>
@@ -64,8 +65,9 @@ export default function Home() {
             <Button 
               variant="outline" 
               className="bg-blue-600 text-white border-blue-500 hover:bg-blue-700"
+              asChild
             >
-              Start Learning
+              <Link href="/intelligence">Start Learning</Link>
             </Button>
           </motion.div>
         </div>
