@@ -1,14 +1,53 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Search } from 'lucide-react'
+import { Search, Menu } from 'lucide-react'
 import Image from 'next/image'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 export default function Navbar() {
   const pathname = usePathname()
-  
+  const [isOpen, setIsOpen] = useState(false)
+
+  const navItems = [
+    { href: '/articles', label: 'Articles' },
+    { href: '/workout-plan', label: 'Workout Plan' },
+    { href: '/shop', label: 'Shop' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' },
+  ]
+
+  const NavLinks = ({ mobile = false }) => (
+    <>
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={`${
+            mobile ? 'text-gray-900' : 'text-gray-300 hover:text-white'
+          } px-3 py-2 ${
+            pathname === item.href ? 'text-white font-semibold' : ''
+          }`}
+          onClick={() => mobile && setIsOpen(false)}
+        >
+          {item.label}
+        </Link>
+      ))}
+      <Button variant="ghost" size="icon" className={mobile ? "text-gray-900" : "text-gray-300"}>
+        <Search className="h-5 w-5" />
+      </Button>
+    </>
+  )
+
   return (
     <nav className="bg-gray-900/50 backdrop-blur-sm fixed w-full z-50 top-0 left-0 border-b border-gray-700">
       <div className="container mx-auto px-4">
@@ -25,49 +64,25 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              href="/articles" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/articles' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              Articles
-            </Link>
-            <Link 
-              href="/workout-plan" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/workout-plan' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              Workout Plan
-            </Link>
-            <Link 
-              href="/shop" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/shop' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              Shop
-            </Link>
-            <Link 
-              href="/about" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/about' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              About
-            </Link>
-            <Link 
-              href="/contact" 
-              className={`text-gray-300 hover:text-white px-3 py-2 ${
-                pathname === '/contact' ? 'text-white font-semibold' : ''
-              }`}
-            >
-              Contact
-            </Link>
-            <Button variant="ghost" size="icon" className="text-gray-300">
-              <Search className="h-5 w-5" />
-            </Button>
+            <NavLinks />
+          </div>
+
+          <div className="md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-gray-300">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col space-y-4 mt-6">
+                  <NavLinks mobile />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
