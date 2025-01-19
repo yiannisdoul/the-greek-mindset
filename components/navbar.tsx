@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Search, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Image from 'next/image'
 import {
   Sheet,
@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { SearchModal } from './search-modal'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -42,9 +43,7 @@ export default function Navbar() {
           {item.label}
         </Link>
       ))}
-      <Button variant="ghost" size="icon" className={mobile ? "text-gray-900" : "text-gray-300"}>
-        <Search className="h-5 w-5" />
-      </Button>
+      <SearchModal />
     </>
   )
 
