@@ -1,16 +1,17 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { use } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { use } from "react"
+import { ArrowLeft } from "lucide-react"
 
 interface StepProps {
   params: Promise<{ step: string }>
@@ -19,52 +20,62 @@ interface StepProps {
 const questions = [
   {
     step: 1,
+    question: "Choose your age group:",
+    options: [
+      { value: "18-29", label: "18-29: Age of the Warrior", description: "Peak physical development" },
+      { value: "30-39", label: "30-39: Age of the Hoplite", description: "Mastery of strength" },
+      { value: "40-49", label: "40-49: Age of the Strategist", description: "Wisdom and power" },
+      { value: "50+", label: "50+: Age of the Sage", description: "Enduring excellence" },
+    ],
+  },
+  {
+    step: 2,
     question: "Where will you train like a Spartan warrior?",
     options: [
       { value: "home", label: "Home Palaestra 🏠", description: "Train in your personal space" },
       { value: "gymnasium", label: "Modern Gymnasium 🏛️", description: "Train in a equipped facility" },
-      { value: "outdoors", label: "Natural Arena 🌳", description: "Train in nature like ancient warriors" }
-    ]
+      { value: "outdoors", label: "Natural Arena 🌳", description: "Train in nature like ancient warriors" },
+    ],
   },
   {
-    step: 2,
+    step: 3,
     question: "Test your strength: How many shield lifts (push-ups) can you perform?",
     options: [
       { value: "beginner", label: "Aspiring Warrior (0-10)" },
       { value: "intermediate", label: "Hoplite Warrior (11-25)" },
       { value: "advanced", label: "Elite Warrior (26-40)" },
-      { value: "elite", label: "Spartan Elite (40+)" }
-    ]
+      { value: "elite", label: "Spartan Elite (40+)" },
+    ],
   },
   {
-    step: 3,
+    step: 4,
     question: "How often do you plan to train like a Spartan?",
     options: [
       { value: "moderate", label: "3 times per week - Warrior's Rhythm" },
       { value: "frequent", label: "4-5 times per week - Elite Training" },
-      { value: "intense", label: "6+ times per week - Spartan Dedication" }
-    ]
+      { value: "intense", label: "6+ times per week - Spartan Dedication" },
+    ],
   },
   {
-    step: 4,
+    step: 5,
     question: "Choose your warrior's diet focus:",
     options: [
       { value: "traditional", label: "Traditional Mediterranean 🫒", description: "Olive oil, fish, vegetables" },
       { value: "warrior", label: "Spartan Black Broth Focus 🥘", description: "High protein, moderate carbs" },
-      { value: "modern", label: "Modern Warrior 🥗", description: "Balanced Mediterranean approach" }
-    ]
+      { value: "modern", label: "Modern Warrior 🥗", description: "Balanced Mediterranean approach" },
+    ],
   },
   {
-    step: 5,
+    step: 6,
     question: "Select your path to excellence:",
     options: [
       { value: "strength", label: "Strength of Hercules 💪", description: "Focus on pure strength" },
       { value: "endurance", label: "Endurance of Pheidippides 🏃", description: "Focus on stamina" },
-      { value: "balanced", label: "Balance of Apollo ⚖️", description: "Equal focus on all aspects" }
-    ]
+      { value: "balanced", label: "Balance of Apollo ⚖️", description: "Equal focus on all aspects" },
+    ],
   },
   {
-    step: 6,
+    step: 7,
     question: "Choose your additional Spartan disciplines:",
     type: "checkbox",
     options: [
@@ -72,44 +83,38 @@ const questions = [
       { id: "cold", label: "Cold Water Immersion" },
       { id: "meditation", label: "Stoic Meditation" },
       { id: "fasting", label: "Warrior's Fasting" },
-      { id: "none", label: "None of the above" }
-    ]
-  },
-  {
-    step: 7,
-    question: "What's your name, warrior?",
-    type: "text",
-    placeholder: "Enter your name"
+      { id: "none", label: "None of the above" },
+    ],
   },
   {
     step: 8,
-    question: "When were you born?",
-    type: "date",
-    placeholder: "DD/MM/YYYY"
+    question: "What's your name, warrior?",
+    type: "text",
+    placeholder: "Enter your name",
   },
   {
     step: 9,
     question: "Your communication scroll (email)",
     type: "email",
-    placeholder: "name@example.com"
-  }
+    placeholder: "name@example.com",
+  },
 ]
 
 export default function StepPage({ params }: StepProps) {
   const router = useRouter()
   const unwrappedParams = use(params)
-  const currentStep = parseInt(unwrappedParams.step)
-  const question = questions.find(q => q.step === currentStep)
+  const currentStep = Number.parseInt(unwrappedParams.step)
+  const question = questions.find((q) => q.step === currentStep)
   const [selected, setSelected] = useState<string | string[]>("")
   const [textValue, setTextValue] = useState("")
-  
+
   const progress = (currentStep / questions.length) * 100
 
   const handleNext = () => {
     if (currentStep < questions.length) {
       router.push(`/fortitude/${currentStep + 1}`)
     } else {
-      router.push('/fortitude/results')
+      router.push("/fortitude/results")
     }
   }
 
@@ -117,7 +122,7 @@ export default function StepPage({ params }: StepProps) {
     if (currentStep > 1) {
       router.push(`/fortitude/${currentStep - 1}`)
     } else {
-      router.push('/fortitude')
+      router.push("/fortitude")
     }
   }
 
@@ -125,7 +130,7 @@ export default function StepPage({ params }: StepProps) {
     if (question?.type === "checkbox") {
       return Array.isArray(selected) && selected.length > 0
     }
-    if (question?.type === "text" || question?.type === "email" || question?.type === "date") {
+    if (question?.type === "text" || question?.type === "email") {
       return textValue.length > 0
     }
     return selected !== ""
@@ -137,23 +142,15 @@ export default function StepPage({ params }: StepProps) {
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-16">
         <Progress value={progress} className="mb-8" />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl mx-auto"
-        >
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            className="mb-4 text-white hover:text-orange-500"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back
-          </Button>
 
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            {question.question}
-          </h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto">
+          {currentStep > 1 && (
+            <Button onClick={handleBack} variant="ghost" className="mb-4 text-white hover:text-orange-500">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            </Button>
+          )}
+
+          <h2 className="text-3xl font-bold mb-8 text-center">{question.question}</h2>
 
           {question.type === "checkbox" ? (
             <div className="space-y-4">
@@ -164,13 +161,9 @@ export default function StepPage({ params }: StepProps) {
                     checked={Array.isArray(selected) && selected.includes(option.id)}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        setSelected(prev => 
-                          Array.isArray(prev) ? [...prev, option.id] : [option.id]
-                        )
+                        setSelected((prev) => (Array.isArray(prev) ? [...prev, option.id] : [option.id]))
                       } else {
-                        setSelected(prev => 
-                          Array.isArray(prev) ? prev.filter(id => id !== option.id) : []
-                        )
+                        setSelected((prev) => (Array.isArray(prev) ? prev.filter((id) => id !== option.id) : []))
                       }
                     }}
                     className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
@@ -184,7 +177,7 @@ export default function StepPage({ params }: StepProps) {
                 </div>
               ))}
             </div>
-          ) : question.type === "text" || question.type === "email" || question.type === "date" ? (
+          ) : question.type === "text" || question.type === "email" ? (
             <Input
               type={question.type}
               placeholder={question.placeholder}
@@ -193,11 +186,7 @@ export default function StepPage({ params }: StepProps) {
               className="bg-gray-900 border-gray-700 text-white"
             />
           ) : (
-            <RadioGroup
-              value={selected as string}
-              onValueChange={setSelected}
-              className="space-y-4"
-            >
+            <RadioGroup value={selected as string} onValueChange={setSelected} className="space-y-4">
               {question.options?.map((option) => (
                 <Label
                   key={option.value}
@@ -213,14 +202,8 @@ export default function StepPage({ params }: StepProps) {
                       />
                     </div>
                     <div className="ml-4">
-                      <div className="text-base font-medium text-white">
-                        {option.label}
-                      </div>
-                      {option.description && (
-                        <div className="text-sm text-gray-400">
-                          {option.description}
-                        </div>
-                      )}
+                      <div className="text-base font-medium text-white">{option.label}</div>
+                      {option.description && <div className="text-sm text-gray-400">{option.description}</div>}
                     </div>
                   </div>
                 </Label>

@@ -25,7 +25,7 @@ export default function Home() {
             onHoverEnd={() => setHoveredSection(null)}
           >
             <Image
-              src="/images/light-logo.jpeg"
+              src="/images/dark-logo.jpeg"
               alt="Warrior Spirit"
               width={250}
               height={250}
@@ -52,7 +52,7 @@ export default function Home() {
             onHoverEnd={() => setHoveredSection(null)}
           >
             <Image
-              src="/images/dark-logo.jpeg"
+              src="/images/light-logo.jpeg"
               alt="Philosophy and Wisdom"
               width={250}
               height={250}
