@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import Navbar from '@/components/navbar'
 
 export default function Home() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hoveredSection, setHoveredSection] = useState<'warrior' | 'philosopher' | null>(null)
 
   return (

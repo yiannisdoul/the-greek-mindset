@@ -102,8 +102,7 @@ const questions = [
 
 export default function StepPage({ params }: StepProps) {
   const router = useRouter()
-  const unwrappedParams = use(params)
-  const currentStep = Number.parseInt(unwrappedParams.step)
+  const currentStep = Number(params.step) || 1
   const question = questions.find((q) => q.step === currentStep)
   const [selected, setSelected] = useState<string | string[]>("")
   const [textValue, setTextValue] = useState("")
@@ -152,64 +151,29 @@ export default function StepPage({ params }: StepProps) {
 
           <h2 className="text-3xl font-bold mb-8 text-center">{question.question}</h2>
 
-          {question.type === "checkbox" ? (
-            <div className="space-y-4">
-              {question.options.map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={option.id}
-                    checked={Array.isArray(selected) && selected.includes(option.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelected((prev) => (Array.isArray(prev) ? [...prev, option.id] : [option.id]))
-                      } else {
-                        setSelected((prev) => (Array.isArray(prev) ? prev.filter((id) => id !== option.id) : []))
-                      }
-                    }}
-                    className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                  />
-                  <label
-                    htmlFor={option.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {option.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-          ) : question.type === "text" || question.type === "email" ? (
-            <Input
-              type={question.type}
-              placeholder={question.placeholder}
-              value={textValue}
-              onChange={(e) => setTextValue(e.target.value)}
-              className="bg-gray-900 border-gray-700 text-white"
-            />
-          ) : (
-            <RadioGroup value={selected as string} onValueChange={setSelected} className="space-y-4">
-              {question.options?.map((option) => (
-                <Label
-                  key={option.value}
-                  htmlFor={option.value}
-                  className="flex items-center p-4 bg-[#1a1d24] rounded-lg cursor-pointer hover:bg-[#272b33] transition-colors"
-                >
-                  <div className="flex items-center flex-1">
-                    <div className="relative flex items-center">
-                      <RadioGroupItem
-                        value={option.value}
-                        id={option.value}
-                        className="w-5 h-5 border-2 border-white data-[state=checked]:border-white data-[state=checked]:bg-white"
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-base font-medium text-white">{option.label}</div>
-                      {option.description && <div className="text-sm text-gray-400">{option.description}</div>}
-                    </div>
+          <RadioGroup value={selected as string} onValueChange={setSelected} className="space-y-4">
+            {question.options?.map((option) => (
+              <Label
+                key={option.value}
+                htmlFor={option.value}
+                className="flex items-center p-4 bg-[#1a1d24] rounded-lg cursor-pointer hover:bg-[#272b33] transition-colors"
+              >
+                <div className="flex items-center flex-1">
+                  <div className="relative flex items-center">
+                    <RadioGroupItem
+                      value={option.value}
+                      id={option.value}
+                      className="w-5 h-5 border-2 border-white data-[state=checked]:border-white data-[state=checked]:bg-white"
+                    />
                   </div>
-                </Label>
-              ))}
-            </RadioGroup>
-          )}
+                  <div className="ml-4">
+                    <div className="text-base font-medium text-white">{option.label}</div>
+                    {option.description && <div className="text-sm text-gray-400">{option.description}</div>}
+                  </div>
+                </div>
+              </Label>
+            ))}
+          </RadioGroup>
 
           <Button
             onClick={handleNext}
@@ -229,4 +193,3 @@ export default function StepPage({ params }: StepProps) {
     </div>
   )
 }
-

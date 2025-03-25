@@ -38,6 +38,7 @@ const articles = [
 ]
 
 export default function IntelligencePage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hoveredSection, setHoveredSection] = useState<'wisdom' | 'knowledge' | null>(null)
 
   return (

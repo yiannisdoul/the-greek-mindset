@@ -7,8 +7,8 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
-  query,
-  where,
+  // query,
+  // where,
   type DocumentData,
 } from "firebase/firestore"
 

@@ -38,6 +38,7 @@ const articles = [
 ]
 
 export default function FortitudePage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hoveredSection, setHoveredSection] = useState<"workout" | "diet" | null>(null)
 
   return (

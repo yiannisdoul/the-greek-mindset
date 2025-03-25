@@ -19,7 +19,7 @@ const sampleData = [
 export default function SearchResultsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const query = searchParams.get('q') || ''
+  const query = searchParams?.get('q') || ''
   const [searchResults, setSearchResults] = useState<typeof sampleData>([])
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function SearchResultsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Search Results for "{query}"</h1>
+      <h1 className="text-3xl font-bold mb-4">Search Results for &quot;{query}&quot;</h1>
       {searchResults.length > 0 ? (
         <ul className="space-y-4">
           {searchResults.map((result) => (
@@ -55,7 +55,7 @@ export default function SearchResultsPage() {
           ))}
         </ul>
       ) : (
-        <p>No results found for "{query}"</p>
+        <p>No results found for &quot;{query}&quot;</p>
       )}
       <Button onClick={() => router.back()} className="mt-8">
         Back to previous page

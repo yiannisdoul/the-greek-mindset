@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"
 import { AuthModal } from "@/components/auth-modal"
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
           <p className="mb-4">
             The Greek Mindset is dedicated to reviving the wisdom of ancient Greece and applying it to modern life. We
             believe that the philosophies, practices, and disciplines of the ancient Greeks hold invaluable lessons for
-            today's world.
+            today&apos;s world.
           </p>
           <p>
             Our goal is to educate and inspire individuals to cultivate both their minds and bodies, embracing the

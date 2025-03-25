@@ -15,7 +15,7 @@ export default function ResultsPage() {
         >
           <h1 className="text-4xl font-bold mb-6">Your Perfect Program Is Ready!</h1>
           <p className="text-xl text-gray-400 mb-8">
-            Based on your answers, we've crafted a personalized training program to help you achieve your fitness goals.
+            Based on your answers, we&apos;ve crafted a personalized training program to help you achieve your fitness goals.
           </p>
 
           <div className="bg-gray-900 p-8 rounded-lg mb-8">
