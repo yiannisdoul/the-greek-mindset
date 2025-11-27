@@ -39,3 +39,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/the-greek-mindset-v2/node_modules
+/the-greek-mindset-v2/.next
+/the-greek-mindset-v2/.vercel
+/the-greek-mindset-v2/env.local
+/the-greek-mindset-v2/next-env.d.ts
+/the-greek-mindset-v2/.DS_Store
+/the-greek-mindset-v2/npm-debug.log*
+/the-greek-mindset-v2/yarn-debug.log*
+/the-greek-mindset-v2/yarn-error.log*
+/the-greek-mindset-v2/pnpm-debug.log*
+/the-greek-mindset-v2/.pnp
+/the-greek-mindset-v2/.pnp.*
+/the-greek-mindset-v2/.yarn/*
+/the-greek-mindset-v2/.next/
+/the-greek-mindset-v2/.firebase
+/the-greek-mindset-v2/out/
+/the-greek-mindset-v2/build

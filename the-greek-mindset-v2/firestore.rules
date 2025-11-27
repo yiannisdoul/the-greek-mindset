@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to read and write their own user documents
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow admin users to read and write their own admin documents
+    match /admin_users/{adminId} {
+      allow read, write: if request.auth != null && request.auth.uid == adminId;
+    }
+    
+    // Allow authenticated users to read/write history data (for admin functionality)
+    match /history/{document} {
+      allow read: if true; // Public read access
+      allow write: if request.auth != null; // Authenticated write access
+    }
+    
+    // Allow authenticated users to read/write geography data
+    match /geography/{document} {
+      allow read: if true; // Public read access
+      allow write: if request.auth != null; // Authenticated write access
+    }
+    
+    // Allow authenticated users to read/write mythology data
+    match /mythology/{document} {
+      allow read: if true; // Public read access
+      allow write: if request.auth != null; // Authenticated write access
+    }
+    
+    // Allow authenticated users to read/write philosophy data
+    match /philosophy/{document} {
+      allow read: if true; // Public read access
+      allow write: if request.auth != null; // Authenticated write access
+    }
+    
+    // Allow authenticated users to read/write exercise data
+    match /exercises/{document} {
+      allow read: if true; // Public read access for workout pages
+      allow write: if request.auth != null; // Authenticated write access for admin
+    }
+    
+    // Allow authenticated users to read/write dance data
+    match /dances/{document} {
+      allow read: if true; // Public read access for dancing pages
+      allow write: if request.auth != null; // Authenticated write access for admin
+    }
+    
+    // Allow authenticated users to read/write recipe data
+    match /recipes/{document} {
+      allow read: if true; // Public read access for cooking pages
+      allow write: if request.auth != null; // Authenticated write access for admin
+      allow create: if request.auth != null; // Explicitly allow create for admin
+      allow update: if request.auth != null; // Explicitly allow update for admin  
+      allow delete: if request.auth != null; // Explicitly allow delete for admin
+    }
+
+    // Dynamic content management
+    match /dynamicContent/{document} {
+      allow read: if true; // Public read access for all pages
+      allow write: if request.auth != null; // Authenticated write access for admin
+      allow create: if request.auth != null; // Explicitly allow create for admin
+      allow update: if request.auth != null; // Explicitly allow update for admin  
+      allow delete: if request.auth != null; // Explicitly allow delete for admin
+    }
+
+    // User progress tracking
+    match /user_progress/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Quiz attempts
+    match /quiz_attempts/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // User learning profiles
+    match /user_learning_profiles/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Achievements
+    match /achievements/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Learning recommendations
+    match /recommendations/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // Weight tracking entries
+    match /weight_entries/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // Body measurements
+    match /body_measurements/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // Workout logs
+    match /workout_logs/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // Progress photos
+    match /progress_photos/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // User workouts
+    match /user_workouts/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // User workout plans
+    match /user_workout_plans/{document} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+  }
+}

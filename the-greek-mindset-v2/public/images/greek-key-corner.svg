@@ -1,0 +1,45 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Greek Key Corner Pattern matching uploaded image -->
+  <defs>
+    <style>
+      .key-stroke { stroke: #D4AF37; stroke-width: 3; fill: none; stroke-linecap: square; }
+      .key-fill { fill: #D4AF37; }
+    </style>
+  </defs>
+  
+  <!-- Top horizontal elements -->
+  <rect class="key-fill" x="0" y="0" width="12" height="6"/>
+  <rect class="key-fill" x="12" y="0" width="6" height="12"/>
+  <rect class="key-fill" x="18" y="0" width="12" height="6"/>
+  <rect class="key-fill" x="30" y="0" width="6" height="12"/>
+  <rect class="key-fill" x="36" y="0" width="12" height="6"/>
+  <rect class="key-fill" x="48" y="0" width="6" height="12"/>
+  <rect class="key-fill" x="54" y="0" width="10" height="6"/>
+  
+  <!-- Left vertical elements -->
+  <rect class="key-fill" x="0" y="6" width="6" height="12"/>
+  <rect class="key-fill" x="0" y="18" width="12" height="6"/>
+  <rect class="key-fill" x="0" y="24" width="6" height="12"/>
+  <rect class="key-fill" x="0" y="36" width="12" height="6"/>
+  <rect class="key-fill" x="0" y="42" width="6" height="12"/>
+  <rect class="key-fill" x="0" y="54" width="12" height="10"/>
+  
+  <!-- Inner pattern elements -->
+  <rect class="key-fill" x="12" y="12" width="12" height="6"/>
+  <rect class="key-fill" x="24" y="6" width="6" height="18"/>
+  <rect class="key-fill" x="30" y="18" width="12" height="6"/>
+  <rect class="key-fill" x="42" y="12" width="6" height="18"/>
+  <rect class="key-fill" x="48" y="24" width="12" height="6"/>
+  
+  <rect class="key-fill" x="6" y="30" width="18" height="6"/>
+  <rect class="key-fill" x="18" y="36" width="6" height="18"/>
+  <rect class="key-fill" x="30" y="42" width="12" height="6"/>
+  <rect class="key-fill" x="36" y="48" width="6" height="16"/>
+  <rect class="key-fill" x="42" y="54" width="22" height="10"/>
+  
+  <!-- Right edge -->
+  <rect class="key-fill" x="58" y="6" width="6" height="58"/>
+  
+  <!-- Bottom edge -->
+  <rect class="key-fill" x="12" y="58" width="52" height="6"/>
+</svg>

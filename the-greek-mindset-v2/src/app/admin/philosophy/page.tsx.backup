@@ -1,0 +1,774 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { AdminRouteGuard } from '@/components/admin/AdminRouteGuard';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { DataTable } from '@/components/admin/DataTable';
+import { FormModal, ConfirmDialog } from '@/components/admin/FormModal';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { PhilosophyItem } from '@/types/admin';
+import { Brain, School, Star, ExternalLink, Upload, Download } from 'lucide-react';
+import { usePhilosophyData } from '@/hooks/use-philosophy-data';
+
+// Form validation schema
+const philosophySchema = z.object({
+  philosopher: z.string().min(1, 'Philosopher name is required').max(200, 'Name too long'),
+  concept: z.string().min(1, 'Concept is required').max(200, 'Concept too long'),
+  description: z.string().min(1, 'Description is required').max(1000, 'Description too long'),
+  quote: z.string().optional().default(''),
+  school: z.enum(['pre-socratic', 'classical', 'hellenistic', 'neoplatonic', 'other']),
+  timeframe: z.string().min(1, 'Timeframe is required'),
+  significance: z.string().min(1, 'Significance is required'),
+  imageUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  relatedConcepts: z.string().optional().default(''),
+  featured: z.boolean().default(false),
+});
+
+type PhilosophyFormData = z.infer<typeof philosophySchema>;
+
+export default function PhilosophyAdmin() {
+  const [philosophyItems, setPhilosophyItems] = useState<PhilosophyItem[]>([
+    {
+      id: '1',
+      name: 'Socrates',
+      type: 'philosopher',
+      period: 'Classical Period (470-399 BCE)',
+      description: 'Socrates was a classical Greek philosopher who is credited as one of the founders of Western philosophy. He is known for the Socratic method of inquiry and his moral philosophy.',
+      keyIdeas: ['Know thyself', 'The unexamined life is not worth living', 'Virtue is knowledge', 'No one does wrong willingly'],
+      quotes: [
+        'The only true wisdom is in knowing you know nothing.',
+        'An unexamined life is not worth living.',
+        'I cannot teach anybody anything. I can only make them think.',
+      ],
+      influences: ['Anaxagoras', 'Parmenides', 'Prodicus'],
+      influenced: ['Plato', 'Xenophon', 'Antisthenes'],
+      attributes: {
+        birthYear: '470 BCE',
+        deathYear: '399 BCE',
+        birthPlace: 'Athens, Greece',
+        school: 'Classical Philosophy',
+        teachers: [],
+        students: ['Plato', 'Xenophon', 'Alcibiades'],
+        works: ['No written works (teachings preserved by Plato)'],
+      },
+      contributions: 'Developed the Socratic method, established ethical philosophy, emphasized self-knowledge and virtue.',
+      modernRelevance: 'Socratic questioning remains fundamental in education, therapy, and critical thinking. His emphasis on ethical living and self-examination continues to influence modern philosophy and psychology.',
+      sources: ['Plato\'s Dialogues', 'Xenophon\'s Memorabilia', 'Aristotle\'s works'],
+      createdAt: '2024-01-15T10:00:00Z',
+      updatedAt: '2024-01-15T10:00:00Z',
+    },
+    {
+      id: '2',
+      name: 'Stoicism',
+      type: 'school',
+      period: 'Hellenistic Period (3rd century BCE - 3rd century CE)',
+      description: 'Stoicism is a school of philosophy that teaches the development of self-control and fortitude as a means of overcoming destructive emotions.',
+      keyIdeas: ['Virtue as the highest good', 'Living according to nature', 'Emotional resilience', 'Focus on what you can control'],
+      quotes: [
+        'You have power over your mind - not outside events. Realize this, and you will find strength. - Marcus Aurelius',
+        'The happiness of your life depends upon the quality of your thoughts. - Marcus Aurelius',
+        'Every new beginning comes from some other beginning\'s end. - Seneca',
+      ],
+      influences: ['Cynicism', 'Heraclitus', 'Socrates'],
+      influenced: ['Modern cognitive behavioral therapy', 'Existentialism', 'Modern psychology'],
+      attributes: {
+        birthYear: '3rd century BCE',
+        deathYear: '3rd century CE',
+        birthPlace: 'Athens, Greece',
+        school: 'Stoic School',
+        teachers: ['Zeno of Citium (founder)'],
+        students: ['Cleanthes', 'Chrysippus', 'Seneca', 'Marcus Aurelius', 'Epictetus'],
+        works: ['Meditations', 'Letters from a Stoic', 'Discourses'],
+      },
+      contributions: 'Developed practical philosophy for daily life, influenced Roman culture, provided framework for emotional resilience.',
+      modernRelevance: 'Stoic principles are widely used in modern cognitive behavioral therapy, mindfulness practices, and leadership development. The focus on personal responsibility and emotional regulation remains highly relevant.',
+      sources: ['Marcus Aurelius\' Meditations', 'Seneca\'s Letters', 'Epictetus\' Discourses'],
+      createdAt: '2024-01-15T11:00:00Z',
+      updatedAt: '2024-01-15T11:00:00Z',
+    },
+  ])
+
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<PhilosophyItem | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState<PhilosophyItem | null>(null)
+  const [viewingItem, setViewingItem] = useState<PhilosophyItem | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState<string>('')
+
+  const form = useForm<PhilosophyItem>({
+    resolver: zodResolver(philosophySchema),
+    defaultValues: {
+      name: '',
+      type: 'philosopher',
+      period: '',
+      description: '',
+      keyIdeas: [],
+      quotes: [],
+      influences: [],
+      influenced: [],
+      attributes: {
+        birthYear: '',
+        deathYear: '',
+        birthPlace: '',
+        school: '',
+        teachers: [],
+        students: [],
+        works: [],
+      },
+      contributions: '',
+      modernRelevance: '',
+      imageUrl: '',
+      sources: [],
+    },
+  })
+
+  const filteredItems = philosophyItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.period.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesType = typeFilter === '' || item.type === typeFilter
+    return matchesSearch && matchesType
+  })
+
+  const handleCreate = () => {
+    form.reset({
+      name: '',
+      type: 'philosopher',
+      period: '',
+      description: '',
+      keyIdeas: [],
+      quotes: [],
+      influences: [],
+      influenced: [],
+      attributes: {
+        birthYear: '',
+        deathYear: '',
+        birthPlace: '',
+        school: '',
+        teachers: [],
+        students: [],
+        works: [],
+      },
+      contributions: '',
+      modernRelevance: '',
+      imageUrl: '',
+      sources: [],
+    })
+    setEditingItem(null)
+    setIsFormOpen(true)
+  }
+
+  const handleEdit = (item: PhilosophyItem) => {
+    setEditingItem(item)
+    form.reset(item)
+    setIsFormOpen(true)
+  }
+
+  const handleDelete = (item: PhilosophyItem) => {
+    setItemToDelete(item)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleView = (item: PhilosophyItem) => {
+    setViewingItem(item)
+  }
+
+  const onSubmit = (data: PhilosophyItem) => {
+    if (editingItem) {
+      // Update existing item
+      setPhilosophyItems(prev => prev.map(item =>
+        item.id === editingItem.id
+          ? { ...data, id: editingItem.id, updatedAt: new Date().toISOString() }
+          : item
+      ))
+    } else {
+      // Create new item
+      const newItem: PhilosophyItem = {
+        ...data,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      setPhilosophyItems(prev => [...prev, newItem])
+    }
+    setIsFormOpen(false)
+    setEditingItem(null)
+    form.reset()
+  }
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      setPhilosophyItems(prev => prev.filter(item => item.id !== itemToDelete.id))
+      setIsDeleteModalOpen(false)
+      setItemToDelete(null)
+    }
+  }
+
+  const columns = [
+    {
+      key: 'name',
+      label: 'Name',
+      render: (item: PhilosophyItem) => (
+        <div className="font-medium text-greek-900">{item.name}</div>
+      ),
+    },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (item: PhilosophyItem) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+          item.type === 'philosopher' ? 'bg-gold-100 text-gold-800' :
+          item.type === 'school' ? 'bg-blue-100 text-blue-800' :
+          item.type === 'concept' ? 'bg-green-100 text-green-800' :
+          item.type === 'text' ? 'bg-purple-100 text-purple-800' :
+          'bg-gray-100 text-gray-800'
+        }`}>
+          {item.type}
+        </span>
+      ),
+    },
+    {
+      key: 'period',
+      label: 'Period',
+      render: (item: PhilosophyItem) => (
+        <div className="text-sm text-gray-600">{item.period}</div>
+      ),
+    },
+    {
+      key: 'keyIdeas',
+      label: 'Key Ideas',
+      render: (item: PhilosophyItem) => (
+        <div className="text-sm text-gray-600">
+          {item.keyIdeas.slice(0, 2).join(', ')}{item.keyIdeas.length > 2 && '...'}
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (item: PhilosophyItem) => (
+        <div className="flex space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleView(item)}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleEdit(item)}
+            className="text-yellow-600 hover:text-yellow-800"
+          >
+            <Edit2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleDelete(item)}
+            className="text-red-600 hover:text-red-800"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ]
+
+  const ArrayInput = ({ 
+    label, 
+    value, 
+    onChange, 
+    placeholder 
+  }: { 
+    label: string
+    value: string[]
+    onChange: (value: string[]) => void
+    placeholder: string 
+  }) => {
+    const [inputValue, setInputValue] = useState('')
+
+    const addItem = () => {
+      if (inputValue.trim() && !value.includes(inputValue.trim())) {
+        onChange([...value, inputValue.trim()])
+        setInputValue('')
+      }
+    }
+
+    const removeItem = (index: number) => {
+      onChange(value.filter((_, i) => i !== index))
+    }
+
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex space-x-2">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addItem())}
+            placeholder={placeholder}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+          />
+          <Button type="button" onClick={addItem} className="px-4 py-2">
+            Add
+          </Button>
+        </div>
+        {value.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {value.map((item, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full"
+              >
+                {item}
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="ml-1 text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <AdminRouteGuard>
+      <AdminLayout>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl font-bold text-greek-900">Philosophy Management</h1>
+              <p className="text-gray-600 mt-1">
+                Manage philosophers, schools, concepts, and philosophical texts
+              </p>
+            </div>
+            <Button
+              onClick={handleCreate}
+              className="bg-gold-600 hover:bg-gold-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Philosophy Item
+            </Button>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search philosophy items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent appearance-none bg-white"
+                >
+                  <option value="">All Types</option>
+                  <option value="philosopher">Philosophers</option>
+                  <option value="school">Schools</option>
+                  <option value="concept">Concepts</option>
+                  <option value="text">Texts</option>
+                  <option value="method">Methods</option>
+                </select>
+              </div>
+              <div className="text-sm text-gray-600 flex items-center">
+                Total: {filteredItems.length} items
+              </div>
+            </div>
+          </div>
+
+          {/* Data Table */}
+          <DataTable
+            data={filteredItems}
+            columns={columns}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+
+          {/* Create/Edit Form Modal */}
+          <FormModal
+            isOpen={isFormOpen}
+            onClose={() => setIsFormOpen(false)}
+            title={editingItem ? 'Edit Philosophy Item' : 'Create New Philosophy Item'}
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    {...form.register('name')}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter name"
+                  />
+                  {form.formState.errors.name && (
+                    <p className="text-red-500 text-sm mt-1">{form.formState.errors.name.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Type</label>
+                  <select
+                    {...form.register('type')}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                  >
+                    <option value="philosopher">Philosopher</option>
+                    <option value="school">School</option>
+                    <option value="concept">Concept</option>
+                    <option value="text">Text</option>
+                    <option value="method">Method</option>
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Period</label>
+                  <input
+                    {...form.register('period')}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter time period or dates"
+                  />
+                  {form.formState.errors.period && (
+                    <p className="text-red-500 text-sm mt-1">{form.formState.errors.period.message}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea
+                    {...form.register('description')}
+                    rows={3}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter detailed description"
+                  />
+                  {form.formState.errors.description && (
+                    <p className="text-red-500 text-sm mt-1">{form.formState.errors.description.message}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <ArrayInput
+                    label="Key Ideas"
+                    value={form.watch('keyIdeas') || []}
+                    onChange={(value) => form.setValue('keyIdeas', value)}
+                    placeholder="Add a key idea"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <ArrayInput
+                    label="Quotes"
+                    value={form.watch('quotes') || []}
+                    onChange={(value) => form.setValue('quotes', value)}
+                    placeholder="Add a quote"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <ArrayInput
+                    label="Influences"
+                    value={form.watch('influences') || []}
+                    onChange={(value) => form.setValue('influences', value)}
+                    placeholder="Add an influence"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <ArrayInput
+                    label="Influenced"
+                    value={form.watch('influenced') || []}
+                    onChange={(value) => form.setValue('influenced', value)}
+                    placeholder="Add someone influenced"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Attributes</label>
+                  <div className="bg-gray-50 p-4 rounded-md space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">Birth Year</label>
+                        <input
+                          {...form.register('attributes.birthYear')}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                          placeholder="e.g., 470 BCE"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">Death Year</label>
+                        <input
+                          {...form.register('attributes.deathYear')}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                          placeholder="e.g., 399 BCE"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">Birth Place</label>
+                        <input
+                          {...form.register('attributes.birthPlace')}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                          placeholder="Enter birth place"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">School</label>
+                      <input
+                        {...form.register('attributes.school')}
+                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                        placeholder="Enter philosophical school"
+                      />
+                    </div>
+                    <ArrayInput
+                      label="Teachers"
+                      value={form.watch('attributes.teachers') || []}
+                      onChange={(value) => form.setValue('attributes.teachers', value)}
+                      placeholder="Add a teacher"
+                    />
+                    <ArrayInput
+                      label="Students"
+                      value={form.watch('attributes.students') || []}
+                      onChange={(value) => form.setValue('attributes.students', value)}
+                      placeholder="Add a student"
+                    />
+                    <ArrayInput
+                      label="Works"
+                      value={form.watch('attributes.works') || []}
+                      onChange={(value) => form.setValue('attributes.works', value)}
+                      placeholder="Add a work"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Contributions</label>
+                  <textarea
+                    {...form.register('contributions')}
+                    rows={2}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter main contributions to philosophy"
+                  />
+                  {form.formState.errors.contributions && (
+                    <p className="text-red-500 text-sm mt-1">{form.formState.errors.contributions.message}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Modern Relevance</label>
+                  <textarea
+                    {...form.register('modernRelevance')}
+                    rows={2}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter modern relevance and applications"
+                  />
+                  {form.formState.errors.modernRelevance && (
+                    <p className="text-red-500 text-sm mt-1">{form.formState.errors.modernRelevance.message}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Image URL</label>
+                  <input
+                    {...form.register('imageUrl')}
+                    type="url"
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+                    placeholder="Enter image URL"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <ArrayInput
+                    label="Sources"
+                    value={form.watch('sources') || []}
+                    onChange={(value) => form.setValue('sources', value)}
+                    placeholder="Add a source"
+                  />
+                </div>
+              </div>
+            </form>
+          </FormModal>
+
+          {/* Delete Confirmation Modal */}
+          <FormModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            title="Delete Philosophy Item"
+            onSubmit={confirmDelete}
+            submitText="Delete"
+            submitVariant="destructive"
+          >
+            <p className="text-gray-600">
+              Are you sure you want to delete "{itemToDelete?.name}"? This action cannot be undone.
+            </p>
+          </FormModal>
+
+          {/* View Details Modal */}
+          {viewingItem && (
+            <FormModal
+              isOpen={!!viewingItem}
+              onClose={() => setViewingItem(null)}
+              title={viewingItem.name}
+              showSubmit={false}
+            >
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Type</h4>
+                    <p className="text-gray-600 capitalize">{viewingItem.type}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">Period</h4>
+                    <p className="text-gray-600">{viewingItem.period}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900">Description</h4>
+                  <p className="text-gray-600">{viewingItem.description}</p>
+                </div>
+
+                {viewingItem.keyIdeas?.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Key Ideas</h4>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      {viewingItem.keyIdeas.map((idea, index) => (
+                        <li key={index}>• {idea}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {viewingItem.quotes?.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Famous Quotes</h4>
+                    <div className="space-y-2 mt-1">
+                      {viewingItem.quotes.map((quote, index) => (
+                        <blockquote key={index} className="text-gray-600 text-sm italic border-l-4 border-gold-300 pl-3">
+                          "{quote}"
+                        </blockquote>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(viewingItem.influences?.length > 0 || viewingItem.influenced?.length > 0) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {viewingItem.influences?.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-gray-900">Influences</h4>
+                        <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                          {viewingItem.influences.map((influence, index) => (
+                            <li key={index}>• {influence}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {viewingItem.influenced?.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-gray-900">Influenced</h4>
+                        <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                          {viewingItem.influenced.map((influenced, index) => (
+                            <li key={index}>• {influenced}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="font-medium text-gray-900">Attributes</h4>
+                  <div className="bg-gray-50 p-3 rounded-md mt-1 space-y-2">
+                    {(viewingItem.attributes.birthYear || viewingItem.attributes.deathYear) && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Lifespan: </span>
+                        <span className="text-sm text-gray-800">
+                          {viewingItem.attributes.birthYear || '?'} - {viewingItem.attributes.deathYear || '?'}
+                        </span>
+                      </div>
+                    )}
+                    {viewingItem.attributes.birthPlace && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Birth Place: </span>
+                        <span className="text-sm text-gray-800">{viewingItem.attributes.birthPlace}</span>
+                      </div>
+                    )}
+                    {viewingItem.attributes.school && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">School: </span>
+                        <span className="text-sm text-gray-800">{viewingItem.attributes.school}</span>
+                      </div>
+                    )}
+                    {viewingItem.attributes.teachers?.length > 0 && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Teachers: </span>
+                        <span className="text-sm text-gray-800">{viewingItem.attributes.teachers.join(', ')}</span>
+                      </div>
+                    )}
+                    {viewingItem.attributes.students?.length > 0 && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Students: </span>
+                        <span className="text-sm text-gray-800">{viewingItem.attributes.students.join(', ')}</span>
+                      </div>
+                    )}
+                    {viewingItem.attributes.works?.length > 0 && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Major Works: </span>
+                        <span className="text-sm text-gray-800">{viewingItem.attributes.works.join(', ')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900">Contributions</h4>
+                  <p className="text-gray-600">{viewingItem.contributions}</p>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900">Modern Relevance</h4>
+                  <p className="text-gray-600">{viewingItem.modernRelevance}</p>
+                </div>
+
+                {viewingItem.sources?.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Sources</h4>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      {viewingItem.sources.map((source, index) => (
+                        <li key={index}>• {source}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </FormModal>
+          )}
+        </div>
+      </AdminLayout>
+    </AdminRouteGuard>
+  )
+}
